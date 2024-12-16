@@ -1,3 +1,3 @@
-# flutter_application_1
+# atlascan_flutter
 
 A new Flutter project.
