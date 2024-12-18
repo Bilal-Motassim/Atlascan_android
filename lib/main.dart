@@ -1,3 +1,5 @@
+import 'package:atlascan_flutter/screens/scan_choice.dart';
+import 'package:atlascan_flutter/screens/scan_redirect.dart';
 import 'package:atlascan_flutter/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
