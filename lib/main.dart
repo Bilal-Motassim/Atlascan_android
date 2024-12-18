@@ -1,22 +1,19 @@
 import 'package:atlascan_flutter/screens/scan_choice.dart';
 import 'package:atlascan_flutter/screens/scan_redirect.dart';
+import 'package:atlascan_flutter/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/',
-      routes: {
-        '/': (context) => ScanRedirect(),
-        '/scan':(context) => ScanChoice()
-      },
+      title: 'Atlascan',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: SplashScreen(),
     );
   }
 }

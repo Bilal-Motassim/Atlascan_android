@@ -30,3 +30,5 @@ flutter:
     - lib/images/driver.png
     - lib/images/drawer.png
     - lib/images/settings.png
+    - assets/logo.png
+
