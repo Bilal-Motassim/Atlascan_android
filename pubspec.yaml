@@ -11,10 +11,13 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.2
   flutter_slidable: ^3.1.2
   flutter_svg: ^2.0.16
   http: ^1.2.2
   image_picker: ^1.1.2
+  permission_handler: ^11.3.1
+  rename_app: ^1.6.1
 
 dev_dependencies:
   flutter_test:
@@ -32,3 +35,9 @@ flutter:
     - lib/images/settings.png
     - assets/logo.png
 
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"
+  adaptive_icon: true

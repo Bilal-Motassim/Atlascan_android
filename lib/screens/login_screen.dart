@@ -1,7 +1,71 @@
+import 'package:atlascan_flutter/models/user.dart';
 import 'package:atlascan_flutter/screens/register_screen.dart';
+import 'package:atlascan_flutter/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final AuthService _authService = AuthService();
+
+  // Create TextEditingControllers to get the user input
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void login(BuildContext context) async {
+    // Get the text entered by the user
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    print(password);
+
+    // Check if the input is valid
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter both email and password.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Send login data
+    Map<String, dynamic> loginData = {
+      "email": email,
+      "password": password,
+    };
+
+    try {
+      User? req = await _authService.loginUser(loginData);
+      if (req != null) {
+        Navigator.pushNamed(
+          context, '/scanredirect',
+          arguments: req,
+        );
+      } else {
+        // Failed login, show an error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to login. Please try again.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      // Error handling for the login
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,9 +95,10 @@ class LoginScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: Column(
                   children: [
-                    _buildTextField('Email'),
+                    _buildTextField('Email', _emailController),
                     SizedBox(height: 20),
-                    _buildTextField('Password'),
+                    _buildTextField('Password', _passwordController,
+                        isPassword: true), // Pass true to obscure text
                     SizedBox(height: 10),
                     Align(
                       alignment: Alignment.centerRight,
@@ -53,7 +118,7 @@ class LoginScreen extends StatelessWidget {
                     SizedBox(height: 30),
                     _buildSignInButton(context),
                     SizedBox(height: 20),
-                    _buildCreateAccount(context), // <-- Mise à jour ici
+                    _buildCreateAccount(context),
                     SizedBox(height: 30),
                     _buildGoogleSignIn(),
                   ],
@@ -66,8 +131,12 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String hintText) {
+  Widget _buildTextField(String hintText, TextEditingController controller,
+      {bool isPassword = false}) {
     return TextField(
+      controller: controller,
+      obscureText:
+          isPassword, // This will obscure the text if it's a password field
       decoration: InputDecoration(
         hintText: hintText,
         border: OutlineInputBorder(
@@ -91,12 +160,7 @@ class LoginScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Page1()),
-          );
-        },
+        onPressed: () => login(context), // Trigger the login process
         child: Text(
           'Sign in',
           style: TextStyle(color: Colors.white, fontSize: 16),
@@ -168,75 +232,6 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class Page1 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          children: [
-            Container(
-              width: 390,
-              height: 844,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(color: Colors.white),
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 254,
-                    top: 550,
-                    child: Opacity(
-                      opacity: 0.25,
-                      child: Container(
-                        width: 456,
-                        height: 456,
-                        decoration: ShapeDecoration(
-                          color: Color(0xFF2F4FCD),
-                          shape: OvalBorder(),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: -432,
-                    top: 28,
-                    child: Opacity(
-                      opacity: 0.25,
-                      child: Container(
-                        width: 456,
-                        height: 456,
-                        decoration: ShapeDecoration(
-                          color: Color(0xFF2F4FCD),
-                          shape: OvalBorder(),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 43,
-                    top: 440,
-                    child: Text(
-                      'Scan Everywhere',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        height: 0,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

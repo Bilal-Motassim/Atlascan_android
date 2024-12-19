@@ -1,13 +1,26 @@
+import 'package:atlascan_flutter/models/user.dart';
 import 'package:flutter/material.dart';
 
 class ScanRedirect extends StatelessWidget {
   const ScanRedirect({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
     // Get screen dimensions
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    User? user;
+    
+
+    if (ModalRoute.of(context)?.settings.arguments != null) {
+      user = ModalRoute.of(context)?.settings.arguments as User;
+    } else {
+      Navigator.pushNamed(
+        context,
+        '/login',
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -132,7 +145,10 @@ class ScanRedirect extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   // Action for "NEXT" button
-                  Navigator.pushNamed(context, '/scan');
+                  Navigator.pushNamed(
+                  context, '/scan',
+                  arguments: user,
+                );
                 },
                 child: Container(
                   width: screenWidth * 0.85,

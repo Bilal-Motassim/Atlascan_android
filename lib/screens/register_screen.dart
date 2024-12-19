@@ -1,7 +1,65 @@
 import 'package:atlascan_flutter/screens/login_screen.dart';
+import 'package:atlascan_flutter/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  // Controllers for the input fields
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
+  // Service instance for user registration
+  final AuthService _authService = AuthService();
+
+  @override
+  void dispose() {
+    // Dispose controllers when the screen is disposed
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  // Function to handle the form submission
+  void _handleRegister() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      // Passwords do not match
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Passwords do not match!')),
+      );
+      return;
+    }
+
+    Map<String, dynamic> registerData = {
+      "username": _fullNameController.text,
+      "email": _emailController.text,
+      "password": _passwordController.text,
+    };
+
+    String result = await _authService.registerUser(registerData);
+
+    // Handle response
+    if (result == 'User registered successfully') {
+      // If registration was successful, navigate to another screen (e.g., login)
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    } else {
+      // If registration failed
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,13 +73,13 @@ class RegisterScreen extends StatelessWidget {
               SizedBox(height: 80),
               _buildHeader(),
               SizedBox(height: 40),
-              _buildInputField('Full Name'),
+              _buildInputField('Full Name', controller: _fullNameController),
               SizedBox(height: 20),
-              _buildInputField('Email'),
+              _buildInputField('Email', controller: _emailController),
               SizedBox(height: 20),
-              _buildInputField('Password', obscureText: true),
+              _buildInputField('Password', controller: _passwordController, obscureText: true),
               SizedBox(height: 20),
-              _buildInputField('Confirm Password', obscureText: true),
+              _buildInputField('Confirm Password', controller: _confirmPasswordController, obscureText: true),
               SizedBox(height: 50),
               _buildSignUpButton(context),
               SizedBox(height: 30),
@@ -62,8 +120,9 @@ class RegisterScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(String label, {bool obscureText = false}) {
+  Widget _buildInputField(String label, {bool obscureText = false, TextEditingController? controller}) {
     return TextField(
+      controller: controller,
       obscureText: obscureText,
       decoration: InputDecoration(
         hintText: label,
@@ -98,9 +157,7 @@ class RegisterScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
         ),
-        onPressed: () {
-          print('Sign Up Clicked');
-        },
+        onPressed: _handleRegister,
         child: Text(
           'Sign up',
           style: TextStyle(
@@ -119,15 +176,16 @@ class RegisterScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Already have an account',
+            'Already have an account?',
             style: TextStyle(fontSize: 14, color: Colors.black54),
           ),
           GestureDetector(
             onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LoginScreen()),
-            );            },
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+              );
+            },
             child: Text(
               ' Sign in',
               style: TextStyle(
