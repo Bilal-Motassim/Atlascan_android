@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:atlascan_flutter/components/document_list.dart';
+import 'package:atlascan_flutter/models/document.dart';
 import 'package:atlascan_flutter/models/user.dart';
 import 'package:atlascan_flutter/screens/data_display.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +19,17 @@ class _ScanChoiceState extends State<ScanChoice> {
   bool showButtons = false;
   bool _isLoading = false;
   User? user;
+  Document? selectedDocument;
 
   final ImagePicker _picker = ImagePicker();
+
+  void handleDocumentSelected(Document doc) {
+    setState(() {
+      selectedDocument = doc;
+      showButtons = true; // Optionally show buttons when a document is selected
+      print('Parent received selected document: ${selectedDocument?.name}');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +65,9 @@ class _ScanChoiceState extends State<ScanChoice> {
       ),
       body: Stack(
         children: [
-          Positioned(child: DocumentList()),
+          Positioned(child: DocumentList(
+            onDocumentSelected: handleDocumentSelected,
+          )),
           Positioned(
             bottom: 110,
             child: Padding(
@@ -238,6 +250,22 @@ class _ScanChoiceState extends State<ScanChoice> {
         imageQuality: 100,
       );
 
+      var url;
+      if(selectedDocument!=null){
+        switch (selectedDocument?.name) {
+          case "ID Card":
+          url = 'http://65.20.105.247:8001/id-card/extract/';
+            break;
+          case "Driver Licence":
+          url = 'http://65.20.105.247:8001/drivers-license/extract/';
+            break;
+          case "Passport":
+          url = 'http://65.20.105.247:8001/passport/extract/';
+          break;
+          default:
+        }
+      }
+
       if (image == null) {
         setState(() => _isLoading = false);
         return;
@@ -245,18 +273,20 @@ class _ScanChoiceState extends State<ScanChoice> {
 
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://ip:8080/api/ocr/extract'),
+        Uri.parse(url),
       );
 
       request.files.add(
-        await http.MultipartFile.fromPath('image', image.path),
+        await http.MultipartFile.fromPath('file', image.path),
       );
-      request.headers['Authorization'] = 'Bearer ${user?.token}';
+      //request.headers['Authorization'] = 'Bearer ${user?.token}';
 
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
+      String decodedBody = utf8.decode(response.bodyBytes);
 
-      var extractedData = json.decode(response.body);
+      var extractedData = json.decode(decodedBody);
+      print(extractedData);
 
       Navigator.push(
         context,

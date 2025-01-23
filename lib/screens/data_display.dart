@@ -7,7 +7,22 @@ class DataDisplayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(data);
+    print(data); // For debugging purposes
+
+    // Safely access 'structured_data'
+    final structuredData = data['structured_data'] as Map<String, dynamic>?;
+
+    if (structuredData == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Extracted Data'),
+        ),
+        body: Center(
+          child: Text('No structured data available.'),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Extracted Data'),
@@ -16,26 +31,35 @@ class DataDisplayScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            Text(
-              'Arabic Data',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
             SizedBox(height: 8),
-            _buildDataItem('Date of Birth', data['extracted_data']?['arabic']?['date_naissance']),
-            _buildDataItem('Place of Birth', data['extracted_data']?['arabic']?['lieu_naissance']),
-            _buildDataItem('Full Name', data['extracted_data']?['arabic']?['nom_complet']),
-            _buildDataItem('CIN Number', data['extracted_data']?['arabic']?['num_cni']),
-            Divider(),
-            Text(
-              'French Data',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            _buildDataItem('Expiration Date', data['extracted_data']?['french']?['date_expiration']),
-            _buildDataItem('Date of Birth', data['extracted_data']?['french']?['date_naissance']),
-            _buildDataItem('Place of Birth', data['extracted_data']?['french']?['lieu_naissance']),
-            _buildDataItem('Full Name', data['extracted_data']?['french']?['nom_complet']),
-            _buildDataItem('CIN Number', data['extracted_data']?['french']?['num_cni']),
+            if (structuredData['Prénom'] != null)
+              _buildDataItem('First Name', structuredData['Prénom']),
+            if (structuredData['Nom de famille'] != null)
+              _buildDataItem('Last Name', structuredData['Nom de famille']),
+            if (structuredData['Date de naissance'] != null)
+              _buildDataItem('Date of Birth', structuredData['Date de naissance']),
+            if (structuredData['Lieu de naissance'] != null)
+              _buildDataItem('Place of Birth', structuredData['Lieu de naissance']),
+            if (structuredData['Num d\'identité'] != null)
+              _buildDataItem('Identity Number', structuredData['Num d\'identité']),
+            if (structuredData['Valable jusqu\'au'] != null)
+              _buildDataItem('Valid Until', structuredData['Valable jusqu\'au']),
+            
+            if (structuredData['Adresse'] != null)
+              _buildDataItem('Address', structuredData['Adresse']),
+            
+            if (structuredData['Numéro de permis'] != null)
+              _buildDataItem('Driver license number', structuredData['Numéro de permis']),
+
+              if (structuredData['Numéro de passport'] != null)
+              _buildDataItem('Passport number', structuredData['Numéro de passport']),
+
+            
+            if (structuredData['Date d\'expiration'] != null)
+              _buildDataItem('Expiration date', structuredData['Date d\'expiration']),
+            
+            if (structuredData['Nationalité'] != null)
+              _buildDataItem('Nationality', structuredData['Nationalité']),
           ],
         ),
       ),

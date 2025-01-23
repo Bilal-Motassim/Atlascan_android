@@ -4,7 +4,9 @@ import 'document_box.dart';
 
 
 class DocumentList extends StatefulWidget {
-  const DocumentList({super.key});
+  final Function(Document) onDocumentSelected;
+
+  const DocumentList({Key? key, required this.onDocumentSelected}) : super(key: key);
 
   @override
   State<DocumentList> createState() => _DocumentListState();
@@ -24,28 +26,30 @@ class _DocumentListState extends State<DocumentList> {
       for (int i = 0; i < documents.length; i++) {
         documents[i].isSelected = (i == index);
       }
-      selectedDocumentName = documents[index].name; // Save the selected document name
-      print('Selected Document: $selectedDocumentName'); // Log for debugging
+      selectedDocumentName = documents[index].name;
+      print('Selected Document: $selectedDocumentName');
+
+      // Trigger the callback to notify the parent
+      widget.onDocumentSelected(documents[index]);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      
-      body: ListView.builder(
-        itemCount: documents.length,
-        itemBuilder: (context, index) {
-          return DocumentBox(
-            name: documents[index].name,
-            url: documents[index].url,
-            isSelected: documents[index].isSelected,
-            onSelected: (bool selected) {
+    return ListView.builder(
+      itemCount: documents.length,
+      itemBuilder: (context, index) {
+        return DocumentBox(
+          name: documents[index].name,
+          url: documents[index].url,
+          isSelected: documents[index].isSelected,
+          onSelected: (bool selected) {
+            if (selected) {
               selectDocument(index);
-            },
-          );
-        },
-      ),
+            }
+          },
+        );
+      },
     );
   }
 }

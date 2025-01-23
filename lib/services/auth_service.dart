@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/user.dart';
 
 class AuthService {
-  static const String baseUrl = "http://ip:8080/api/auth";
+  static const String baseUrl = "http://13.40.214.118:8080/api/auth";
 
 // Register user
 Future<String> registerUser(Map<String, dynamic> registerData) async {
